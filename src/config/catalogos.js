@@ -1,0 +1,11 @@
+// ROLES DE USUARIO
+export const ROLES = {
+    SUPERADMINISTRADOR: 1,
+    ADMINISTRADOR: 2,
+    MIEMBRO: 3,
+    INFLUENCER: 4
+};
+
+
+// CATÁLOGOS
+

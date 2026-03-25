@@ -36,28 +36,17 @@ export const login = async (req, res) => {
         const token = authService.generarToken(resultadoUsuario);
         const tokenRefresh = authService.refreshToken(resultadoUsuario);
 
-        // Guardar el access token en una cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 2 * 60 * 60 * 1000 // 2 horas
-        });
-
-        // Guardar el refresh token en una cookie diferente
-        res.cookie('jwt', tokenRefresh, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 12 * 60 * 60 * 1000 // 12 horas
-        });
-
 
         return res.status(200).json({
             codigo: 200,
             estatus: 'success',
             mensaje: 'Login exitoso',
-            datos: null,
+            datos: {
+                accessToken: token,
+                refreshToken: tokenRefresh,
+                tokenType: 'Bearer',
+                expiresIn: '2h'
+            },
             paginacion: null,
             errores: null
         });
@@ -90,7 +79,9 @@ export const login = async (req, res) => {
 
 export const refresh = async (req, res) => {
     try {
-        if (!req.cookies?.jwt) {
+        const refreshToken = req.body?.refreshToken;
+
+        if (!refreshToken) {
             return res.status(406).json({
                 codigo: 406,
                 estatus: 'fail',
@@ -101,10 +92,8 @@ export const refresh = async (req, res) => {
             });
         }
 
-        const refreshTokenCookie = req.cookies.jwt;
-
         // Verificar el refresh token
-        const decodificado = jwt.verify(refreshTokenCookie, process.env.SECRET_JWT_KEY_REFRESH);
+        const decodificado = jwt.verify(refreshToken, process.env.SECRET_JWT_KEY_REFRESH);
         
         const usuarioDecodificado = {
             id_usuario: decodificado.id,
@@ -114,26 +103,16 @@ export const refresh = async (req, res) => {
         const nuevoAccessToken = authService.generarToken(usuarioDecodificado);
         const nuevoRefreshToken = authService.refreshToken(usuarioDecodificado);
 
-        // Actualizar ambas cookies
-        res.cookie('token', nuevoAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 2 * 60 * 60 * 1000 // 2 horas
-        });
-
-        res.cookie('jwt', nuevoRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 12 * 60 * 60 * 1000 // 12 horas
-        });
-
         return res.status(200).json({
             codigo: 200,
             estatus: 'success',
             mensaje: 'Tokens actualizados exitosamente',
-            datos: null,
+            datos: {
+                accessToken: nuevoAccessToken,
+                refreshToken: nuevoRefreshToken,
+                tokenType: 'Bearer',
+                expiresIn: '2h'
+            },
             paginacion: null,
             errores: null
         });
@@ -164,21 +143,8 @@ export const refresh = async (req, res) => {
 }
 
 
-export const logout = async (req, res) => {
+export const logout = async (req, res) => { ////PENDIENTE
     try {
-        // Borrar ambas cookies
-        res.clearCookie('token', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
-        
-        res.clearCookie('jwt', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
-
         return res.status(200).json({
             codigo: 200,
             estatus: 'success',

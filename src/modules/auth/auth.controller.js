@@ -34,7 +34,8 @@ export const login = async (req, res) => {
         const resultadoUsuario = await authService.loginService(datosLogin.correo, datosLogin.contrasena);
 
         const token = authService.generarToken(resultadoUsuario);
-        const tokenRefresh = authService.refreshToken(resultadoUsuario);
+        // Demo básica: no usamos refresh token por ahora.
+        // const tokenRefresh = authService.refreshToken(resultadoUsuario);
 
 
         return res.status(200).json({
@@ -43,7 +44,7 @@ export const login = async (req, res) => {
             mensaje: 'Login exitoso',
             datos: {
                 accessToken: token,
-                refreshToken: tokenRefresh,
+                // refreshToken: tokenRefresh,
                 tokenType: 'Bearer',
                 expiresIn: '2h'
             },

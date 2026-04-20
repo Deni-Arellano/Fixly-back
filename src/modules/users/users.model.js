@@ -2,7 +2,7 @@ import pool from "../../config/db.js";
 
 export const estadoDelUsuario = async (correo) => {
     const [rows] = await pool.query(
-        "SELECT activo FROM usuarios WHERE correo = ? LIMIT 1", [correo]
+        "SELECT estado_id FROM usuarios WHERE correo = ? LIMIT 1", [correo]
     );
     return rows[0]
     
@@ -10,7 +10,7 @@ export const estadoDelUsuario = async (correo) => {
 
 export const encontrarUsuarioPorEmail = async (email) => {
     const [rows] = await pool.query(
-    "SELECT id_usuario, correo, contrasena_hash, verificado, fecha_registro, activo FROM usuarios WHERE correo = ? LIMIT 1",
+    "SELECT id, nombre, apellido_paterno, apellido_materno, correo, password, telefono, foto_perfil, rol_id, estado_id, created_at FROM usuarios WHERE correo = ? LIMIT 1",
     [email]
     );
     return rows[0];

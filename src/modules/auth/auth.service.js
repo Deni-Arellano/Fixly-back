@@ -4,11 +4,14 @@ import 'dotenv/config';
 import * as userModel from '../users/users.model.js';
 
 
+import * as catalogos from "../../config/catalogos.js";
+
 export const loginService = async (correo, contrasena) => {
 
     
     //Verificar que el usuario exista (email)
     const usuario = await userModel.encontrarUsuarioPorEmail(correo);
+    console.log(usuario)
 
     if (!usuario){ //No existe el usuario
         const error = new Error('Usuario no encontrado');
@@ -18,14 +21,14 @@ export const loginService = async (correo, contrasena) => {
 
     //Verificar estado del usuario
     const estado = await userModel.estadoDelUsuario(correo)
-    if (!estado || estado.activo == 0){
+    if (!estado || estado.estado_id == catalogos.ESTADOS_USUARIO.SUSPENDIDO){
         const error = new Error('Tu cuenta está actualmente inactiva. Por favor, comunícate con soporte para más información');
         error.codigo = 403;
         throw error;
     }
 
     //Verificar la contraseña
-    const  esCorrecta = await bcrypt.compare(contrasena, usuario.contrasena_hash);
+    const  esCorrecta = await bcrypt.compare(contrasena, usuario.password);
 
     if (!esCorrecta){ // contrasela incorrecta
         const error = new Error('Contraseña incorrecta')

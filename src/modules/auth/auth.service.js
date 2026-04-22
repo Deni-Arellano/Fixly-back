@@ -30,7 +30,7 @@ export const loginService = async (correo, contrasena) => {
     //Verificar la contraseña
     const  esCorrecta = await bcrypt.compare(contrasena, usuario.password);
 
-    if (!esCorrecta){ // contrasela incorrecta
+    if (!esCorrecta){ // contraseña incorrecta
         const error = new Error('Contraseña incorrecta')
         error.codigo = 401;
         throw error;
@@ -41,7 +41,7 @@ export const loginService = async (correo, contrasena) => {
 
 export const generarToken = (usuario) => {
     const token = jwt.sign(
-        { id: usuario.id_usuario, usuario: usuario.email },
+        { id: usuario.id, usuario: usuario.correo },
         process.env.SECRET_JWT_KEY,
         {
             expiresIn: '2h'
@@ -51,14 +51,3 @@ export const generarToken = (usuario) => {
     return token;
 }
 
-export const refreshToken = (usuario) => {
-    const token = jwt.sign(
-        { id: usuario.id_usuario, usuario: usuario.email },
-        process.env.SECRET_JWT_KEY_REFRESH,
-        {
-            expiresIn: '12h'
-        }
-    );
-
-    return token;
-}

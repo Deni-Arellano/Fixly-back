@@ -1,15 +1,15 @@
 import * as userValidation from './users.validation.js';
 import * as userService from "./users.service.js";
-import { ROLES } from "../../config/catalogos.js";
+import * as catalogos from "../../config/catalogos.js";
 
 
-export const crearAdministrador = async (req, res) => {
+export const registrarCliente = async (req, res) => {
     try {
-        const datosAdministrador = req.body;
-
+        const datosCliente = req.body;
+        //console.log(datosCliente)
 
         //Validar datos usuario
-        const result = userValidation.usuarioAgregarSchema.safeParse(datosAdministrador);
+        const result = userValidation.clienteRegistroSchema.safeParse(datosCliente);
 
 
         if (!result.success) {
@@ -31,10 +31,13 @@ export const crearAdministrador = async (req, res) => {
             });
         }
         // insertamos rol
-        datosAdministrador.usuario.id_rol = 2;
+        datosCliente.rol_id = catalogos.ROLES.CLIENTE;
+        datosCliente.estado_id = catalogos.ESTADOS_USUARIO.ACTIVO;
         // Agregar a base de datos
+        //console.log("listo")
+        //console.log(datosCliente)
 
-        const resultadoUsuario = await userService.crearUsuario(datosAdministrador);
+        const resultadoUsuario = await userService.registrarCliente(datosCliente);
 
 
         return res.status(200).json({
@@ -46,7 +49,6 @@ export const crearAdministrador = async (req, res) => {
             errores: null
         });
 
-        //Respuesta
     } catch (error) {
         console.log(error)
         const codigoEstatus = error.codigo || 500;
@@ -63,7 +65,7 @@ export const crearAdministrador = async (req, res) => {
     }
 }
 
-export const crearMiembro = async (req, res) => {
+export const registrarPrestador = async (req, res) => {
     try {
         const datosMiembro = req.body;
 

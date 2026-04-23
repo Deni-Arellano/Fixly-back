@@ -42,3 +42,26 @@ export const verificarTelefonoRepetido = async (telefono, id_usuario) => {
     
 }
 
+export const verificarCorreoRepetido = async (correo) => {
+    const [rows] = await pool.query(
+        `SELECT correo
+        FROM usuarios
+        WHERE correo = ?
+        LIMIT 1`, [correo]
+            );
+
+    return rows[0];
+    
+}
+
+export const agregarCliente= async(datosCliente) => {
+    const [rows] = await pool.query(
+    `INSERT INTO usuarios (
+        nombre, apellido_paterno, apellido_materno, correo, password, telefono, rol_id, estado_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+        [datosCliente.nombre, datosCliente. apellido_paterno, datosCliente.apellido_materno, datosCliente.correo, datosCliente.password, datosCliente.telefono, datosCliente.rol_id, datosCliente.estado_id]
+    );
+
+    return rows[0];
+}
+

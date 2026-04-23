@@ -11,7 +11,7 @@ export const loginService = async (correo, contrasena) => {
     
     //Verificar que el usuario exista (email)
     const usuario = await userModel.encontrarUsuarioPorEmail(correo);
-    console.log(usuario)
+    //console.log(usuario)
 
     if (!usuario){ //No existe el usuario
         const error = new Error('Usuario no encontrado');

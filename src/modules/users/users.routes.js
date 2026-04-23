@@ -7,11 +7,7 @@ import * as permisos from '../../config/permisos.js';
 
 const router = Router();
 //Crear usuario
-router.post('/crearAdministrador', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.CREAR_USUARIO_ADMINISTRADOR), userController.crearAdministrador);
-router.post('/crearMiembro', userController.crearMiembro); // Público sin middleware
-router.put('/editarUsuario/:id', authMiddleware.verificarToken, userMiddleware.puedeEditarUsuario, userController.editarUsuario);
-router.put('/cambiarEstado/:id', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.CAMBIAR_ESTADO_USUARIO), userController.cambiarEstado);
-router.get('/obtenerUsuario/:id', authMiddleware.verificarToken, userMiddleware.puedeVerUsuario, userController.verUsuario);
-router.get('/obtenerUsuarios', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.VER_USUARIOS), userController.obtenerUsuarios);
+router.post('/registrarProveedor', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.CREAR_USUARIO_ADMINISTRADOR), userController.registrarPrestador);
+router.post('/registrarCliente', userController.registrarCliente); // Público sin middleware
 
 export default router;

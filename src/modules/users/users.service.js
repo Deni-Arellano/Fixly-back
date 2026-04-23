@@ -4,31 +4,23 @@ import pool from "../../config/db.js";
 
 import { ROLES } from "../../config/catalogos.js";
 
-export const crearUsuario = async (datosUsuario) => {
+export const registrarCliente = async (datosUsuario) => {
     // Verificar que el correo no esté repetido, teléfono y rfc no esté repetido
 
-    const repetido = await userModel.verificarCorreoTelefonoRFCRepetido(datosUsuario);
-
+    const repetido = await userModel.verificarCorreoRepetido(datosUsuario.correo);
+    console.log(repetido)
     if (repetido){
-        let mensaje;
-        // Se ve cual campo está repetido
-        if (repetido.correo == datosUsuario.usuario.correo){
-            mensaje = 'El correo ya está registrado';
-        } else if (repetido.telefono == datosUsuario.datos_personales.telefono){
-            mensaje = 'El teléfono ya está registrado';
-        } else {
-            mensaje = 'El RFC ya está registrado';
-        }
+        const mensaje = 'El correo ya está registrado';
         const error = new Error(mensaje);
         error.codigo = 409;
-
         throw error;
     }
-    const contrasena_hash = await bcrypt.hash(datosUsuario.usuario.contrasena, 12);
+    const contrasena_hash = await bcrypt.hash(datosUsuario.password, 12);
 
-    datosUsuario.usuario.contrasena = contrasena_hash; 
 
-    const usuario = await userModel.agregarUsuario(datosUsuario);
+    datosUsuario.password = contrasena_hash; 
+
+    const usuario = await userModel.agregarCliente(datosUsuario);
 
     return usuario;
 

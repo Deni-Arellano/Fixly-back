@@ -19,7 +19,7 @@ const clienteSchema = z.object({
     .min(2, 'El apellido materno debe tener al menos 2 caracteres')
     .max(100, 'El apellido materno no puede superar los 100 caracteres')
     .regex(nombreRegex, 'Solo se permiten letras, espacios, acentos, ñ, guion, apóstrofe y punto')
-    .optional(),
+    .optional().or(z.literal("")),
 
   correo: z.email('El correo no es válido')
     .min(5, 'El correo debe tener al menos 5 caracteres')

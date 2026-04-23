@@ -20,7 +20,7 @@ export const registrarCliente = async (datosUsuario) => {
 
     datosUsuario.password = contrasena_hash; 
 
-    const usuario = await userModel.agregarCliente(datosUsuario);
+    const usuario = await userModel.agregarUsuario(datosUsuario);
 
     return usuario;
 

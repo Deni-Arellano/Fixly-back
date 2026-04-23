@@ -46,7 +46,9 @@ export const login = async (req, res) => {
                 accessToken: token,
                 // refreshToken: tokenRefresh,
                 tokenType: 'Bearer',
-                expiresIn: '2h'
+                expiresIn: '2h',
+                id_usuario: resultadoUsuario.id,
+                id_rol: resultadoUsuario.rol_id
             },
             paginacion: null,
             errores: null

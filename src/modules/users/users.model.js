@@ -56,36 +56,50 @@ export const verificarCorreoRepetido = async (correo) => {
 
 
 export const agregarUsuario= async(datosCliente) => {
-    const [rows] = await pool.query(
+    const [result] = await pool.query(
     `INSERT INTO usuarios (
         nombre, apellido_paterno, apellido_materno, correo, password, telefono, rol_id, estado_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
         [datosCliente.nombre, datosCliente.apellido_paterno, datosCliente.apellido_materno, datosCliente.correo, datosCliente.password, datosCliente.telefono, datosCliente.rol_id, datosCliente.estado_id]
     );
 
-    return rows[0];
+    return { id: result.insertId };
 }
 
+export const agregarUsuarioConConn = async (conn, datosUsuario) => {
+  const [result] = await conn.query(
+    `INSERT INTO usuarios (nombre, apellido_paterno, apellido_materno, correo, password, telefono, rol_id, estado_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [datosUsuario.nombre, datosUsuario.apellido_paterno, datosUsuario.apellido_materno, datosUsuario.correo, datosUsuario.password, datosUsuario.telefono, datosUsuario.rol_id, datosUsuario.estado_id]
+  );
+  return result.insertId;
+};
 
-export const insertarPrestador= async(datosPrestador) => {
-    const [rows] = await pool.query(
+
+export const insertarPrestador= async(conn, datosPrestador) => {
+    const [result] = await conn.query(
     `INSERT INTO prestador(
-        id, usuario_id, descripcion)
-        VALUES (?, ?, ?)`, 
-        [datosPrestador.id, datosPrestador.usuario_id, datosPrestador.descripcion]
-    );
-
-    return rows[0];
-}
-
-
-export const insertarServicios= async(datosServicios) => { // dinamico pendeinte
-    const [rows] = await pool.query(
-    `INSERT INTO prestador_servicios (
-        prestador_id, servicio_id)
+        usuario_id, descripcion)
         VALUES (?, ?)`, 
-        [datosServicios.prestador_id, datosServicios.servicio_id]
+        [datosPrestador.usuario_id, datosPrestador.descripcion]
     );
 
-    return rows[0];
+    return result.insertId;
 }
+
+
+export const insertarServicios = async (conn, { prestador_id, servicios }) => {
+  if (!Array.isArray(servicios) || servicios.length === 0) {
+    return { affectedRows: 0 };
+  }
+
+  const valores = servicios.map(() => "(?, ?)").join(", ");
+  const params = servicios.flatMap((servicio_id) => [prestador_id, servicio_id]);
+
+  const [result] = await conn.query(
+    `INSERT INTO prestador_servicios (prestador_id, servicio_id) VALUES ${valores}`,
+    params
+  );
+
+  return result;
+};

@@ -8,7 +8,7 @@ export const registrarCliente = async (datosUsuario) => {
     // Verificar que el correo no esté repetido, teléfono y rfc no esté repetido
 
     const repetido = await userModel.verificarCorreoRepetido(datosUsuario.correo);
-    console.log(repetido)
+    //console.log(repetido)
     if (repetido){
         const mensaje = 'El correo ya está registrado';
         const error = new Error(mensaje);
@@ -27,175 +27,52 @@ export const registrarCliente = async (datosUsuario) => {
     
 } 
 
-export const actualizarAutoEdicion = async (idUsuario, datosAEditar) => {
-    if (!datosAEditar.datos_personales || Object.keys(datosAEditar.datos_personales).length === 0) {
-        const error = new Error('No se enviaron datos personales para actualizar');
-        error.codigo = 400;
-        throw error;
-    }
-    const conexion = await pool.getConnection();
-    try {
-        // Solo validar teléfono si viene en la petición
-        if (datosAEditar.datos_personales.telefono) {
-            const repetido = await userModel.verificarTelefonoRepetido(datosAEditar.datos_personales.telefono, idUsuario);
-            if (repetido) {
-                const error = new Error('El teléfono ya está registrado');
-                error.codigo = 409;
-                throw error;
-            }
-        }
-        const filasAfectadas = await userModel.editarTablaDatosPersonalesPorID(conexion, idUsuario, datosAEditar.datos_personales);
-        if (filasAfectadas === 0) {
-            const error = new Error('No se actualizó ningún dato');
-            error.codigo = 404;
-            throw error;
-        }
-    
-        return datosAEditar;
-    } finally {
-        if (conexion) conexion.release();
-    }
-}
-
-export const actualizarEdicionAdmin = async (idUsuario, datosAEditar) => {
-        if (!idUsuario || isNaN(Number(idUsuario))) {
-            throw new Error('idUsuario inválido en actualizarEdicionAdmin');
-        }
-        if (
-            (!datosAEditar.usuario || Object.keys(datosAEditar.usuario).length === 0) &&
-            (!datosAEditar.datos_personales || Object.keys(datosAEditar.datos_personales).length === 0)
-        ) {
-            const error = new Error('No se enviaron datos para actualizar');
-            error.codigo = 400;
-            throw error;
-        }
-
-    const conexion = await pool.getConnection();
-
-    try {
-        const es = await userModel.obtenerRolUsuario(idUsuario);
-        if (es.id_rol !== ROLES.MIEMBRO && es.id_rol !== ROLES.INFLUENCER) {
-            const error = new Error(`No tienes permiso para editar`);
-            error.codigo = 403;
-            throw error;
-        }
-        
-        if (datosAEditar.datos_personales.rfc || datosAEditar.datos_personales.telefono) {
-            const repetido = await userModel.verificarTelefonoRFCRepetido(idUsuario, datosAEditar.datos_personales);
-            if (repetido && repetido.campo_repetido) {
-                const error = new Error(`El ${repetido.campo_repetido} ya está registrado`);
-                error.codigo = 409;
-                throw error;
-            }
-        }
-
-        await conexion.beginTransaction();
-        const datosTablaDP = datosAEditar.datos_personales;
-        const datosTablaU = datosAEditar.usuario;
-        console.log(datosTablaU, datosTablaDP)
-
-        //Actualización tabla usuarios
-        if (datosTablaU && Object.keys(datosTablaU).length > 0) {
-            const filasAfectadasU = await userModel.editarTablaUsuariosPorID(conexion, idUsuario, datosTablaU);
-            if (filasAfectadasU === 0) {
-                const error = new Error('No se actualizó ningún dato');
-                error.codigo = 404;
-                throw error;
-            }
-        }
-
-        //Actualización tabla datos personales
-        if (datosTablaDP && Object.keys(datosTablaDP).length > 0) {
-            const filasAfectadasDP = await userModel.editarTablaDatosPersonalesPorID(conexion, idUsuario, datosTablaDP);
-            if (filasAfectadasDP === 0) {
-                const error = new Error('No se actualizó ningún dato');
-                error.codigo = 404;
-                throw error;
-            }
-        }
-        await conexion.commit();
-        return datosAEditar;
-    } catch (error) {
-        await conexion.rollback();
-        if (!error.codigo) {
-            error.message = 'Ha ocurrido un error inesperado';
-            error.codigo = 500;
-        }
-        throw error;
-    } finally {
-        if (conexion) conexion.release();
-    }
-}
-
-export const actualizarEdicionSuperAdmin = async (idUsuario, datosAEditar) => {
-    if (
-        (!datosAEditar.usuario || Object.keys(datosAEditar.usuario).length === 0) &&
-        (!datosAEditar.datos_personales || Object.keys(datosAEditar.datos_personales).length === 0)
-    ) {
-        const error = new Error('No se enviaron datos para actualizar');
-        error.codigo = 400;
-        throw error;
-    }
-
-    const conexion = await pool.getConnection();
-
+export const registrarPrestador = async (datosUsuario) => {
+    const conn = await pool.getConnection();
     try{
-        const repetido = await userModel.verificarCorreoTelefonoRFCRepetidoEdit(idUsuario,datosAEditar);
-        console.log('Repetido', repetido);
-        if (repetido && repetido.campo_repetido) {
-            const error = new Error(`El ${repetido.campo_repetido} ya está registrado`);
+        await conn.beginTransaction();
+
+        const repetido = await userModel.verificarCorreoRepetido(datosUsuario.usuario.correo);
+        console.log(repetido)
+        if (repetido){
+            const mensaje = 'El correo ya está registrado';
+            const error = new Error(mensaje);
             error.codigo = 409;
             throw error;
         }
+        const contrasena_hash = await bcrypt.hash(datosUsuario.usuario.password, 12);
 
-        await conexion.beginTransaction();
 
-        const datosTablaDP = datosAEditar.datos_personales;
-        const datosTablaU = datosAEditar.usuario;
-    
+        datosUsuario.usuario.password = contrasena_hash; 
 
-        //Actualización tabla usuarios
-        if (datosTablaU && Object.keys(datosTablaU).length > 0){
 
-                console.log("empezando datos tabla U")
-                const filasAfectadasU = await userModel.editarTablaUsuariosPorID(conexion, idUsuario, datosTablaU);
 
-                console.log("terminando datos tabla U")
-                if (filasAfectadasU === 0) {
-                    const error = new Error('No se actualizó ningún dato');
-                    error.codigo = 404;
-                    throw error;
-                }
-        }
+        const idUsuario = await userModel.agregarUsuarioConConn(conn, datosUsuario.usuario);
 
-    
-        //Actualización tabla datos personales
-        if (datosTablaDP && Object.keys(datosTablaDP).length > 0){
-        
-            const filasAfectadasDP = await userModel.editarTablaDatosPersonalesPorID(conexion, idUsuario, datosTablaDP);
-            if (filasAfectadasDP === 0) {
-                const error = new Error('No se actualizó ningún dato');
-                error.codigo = 404;
-                throw error;
-            }
-        }
+        const datosTablaPrestador = {
+            usuario_id: idUsuario, 
+            descripcion: datosUsuario.datos_prestador.descripcion
+            };
+        const idPrestador = await userModel.insertarPrestador(conn, datosTablaPrestador);
 
-        await conexion.commit();
-        return datosAEditar;
+        const datosServicios = {
+            prestador_id: idPrestador, 
+            servicios: datosUsuario.datos_prestador.servicios
+            };
+        await userModel.insertarServicios(conn, datosServicios);
 
+        await conn.commit();
+        return {id: idUsuario};
     } catch (error){
-        await conexion.rollback();
-        if (!error.codigo) {
-            error.message = 'Ha ocurrido un error inesperado';
-            error.codigo = 500;
-        }
+        await conn.rollback();
         throw error;
-
-    } finally {
-        if (conexion) conexion.release();
+        
+    } finally{
+        conn.release();
     }
-    
+        
 }
+
 
 export const editarEstadoUsuario = async (idUsuarioEditar, rolAdmin, idRolAdmin, idUsuarioAdmin, estado) => {
     // Obtener el rol del usuario a editar

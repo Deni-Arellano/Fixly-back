@@ -37,7 +37,7 @@ const clienteSchema = z.object({
     .regex(telefonoRegex, 'El teléfono debe contener entre 10 y 15 dígitos')
 }).strict();
 
-const prestadorSchema = clienteSchema.extend({
+const prestadorSchema = z.object({
   descripcion: z.string()
     .min(1, 'La descripción es obligatoria'),
 

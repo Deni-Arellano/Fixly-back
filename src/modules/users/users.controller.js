@@ -67,13 +67,13 @@ export const registrarCliente = async (req, res) => {
 
 export const registrarPrestador = async (req, res) => {
     try {
-        const datosMiembro = req.body;
+        const datosPrestador = req.body;
 
 
-        //console.log(datosMiembro);
+        //console.log(datosPrestador);
 
         //Validar datos usuario
-        const result = userValidation.usuarioAgregarSchema.safeParse(datosMiembro);
+        const result = userValidation.prestadorRegistroSchema.safeParse(datosPrestador);
 
 
         if (!result.success) {
@@ -94,12 +94,12 @@ export const registrarPrestador = async (req, res) => {
                 errores: errores
             });
         }
-        // insertamos rol
-        datosMiembro.usuario.id_rol = 3;
+        // insertamos rol y estado
+        datosPrestador.usuario.rol_id = catalogos.ROLES.PRESTADOR;
+        datosPrestador.usuario.estado_id = catalogos.ESTADOS_USUARIO.ACTIVO;
 
         // Agregar a base de datos
-
-        const resultadoUsuario = await userService.crearUsuario(datosMiembro);
+        const resultadoUsuario = await userService.registrarPrestador(datosPrestador);
 
 
         return res.status(200).json({

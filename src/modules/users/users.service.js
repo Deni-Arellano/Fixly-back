@@ -110,7 +110,7 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
         }
 
         const resultadoPromedioYCalidficaciones = await userModel.obtenerPromedioYComentarios(
-            resultadoDatosUsuario.id_prestador
+            idUsuario
         );
 
         const serviciosRaw = resultadoDatosUsuario.servicios;

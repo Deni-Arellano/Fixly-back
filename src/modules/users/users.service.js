@@ -83,7 +83,22 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
             throw error;
         }
 
-        return resultado;
+        
+
+        return {
+                id: resultado.id,
+                nombre_completo: [
+                    resultado.nombre,
+                    resultado.apellido_paterno,
+                    resultado.apellido_materno
+                ].filter(Boolean).join(" "),
+                correo: resultado.correo,
+                telefono: resultado.telefono,
+                foto_perfil: resultado.foto_perfil,
+                rol_id: resultado.rol_id,
+                estado_id: resultado.estado_id,
+                created_at: resultado.created_at
+            };
         
 
     } else if (id_rol == ROLES.PRESTADOR){
@@ -108,9 +123,11 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
         return {
             usuario: {
                 id: resultadoDatosUsuario.id,
-                nombre: resultadoDatosUsuario.nombre,
-                apellido_paterno: resultadoDatosUsuario.apellido_paterno,
-                apellido_materno: resultadoDatosUsuario.apellido_materno,
+                nombre_completo: [
+                    resultadoDatosUsuario.nombre,
+                    resultadoDatosUsuario.apellido_paterno,
+                    resultadoDatosUsuario.apellido_materno
+                ].filter(Boolean).join(" "),
                 correo: resultadoDatosUsuario.correo,
                 telefono: resultadoDatosUsuario.telefono,
                 foto_perfil: resultadoDatosUsuario.foto_perfil,

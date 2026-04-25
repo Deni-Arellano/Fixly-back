@@ -1,6 +1,7 @@
 import express from 'express';
 import adminRoutes from './modules/admin/admin.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
+import catalogosRoutes from './modules/catalogs/catalogs.routes.js';
 import providersRoutes from './modules/providers/providers.routes.js';
 import reviewRoutes from './modules/review/review.routes.js';
 import serviceRoutes from './modules/service/service.routes.js';
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/catalogs', catalogosRoutes);
 app.use('/api/providers', providersRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/services', serviceRoutes);

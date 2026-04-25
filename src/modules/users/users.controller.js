@@ -130,6 +130,48 @@ export const registrarPrestador = async (req, res) => {
 
 }
 
+export const verPerfil = async (req, res) => {
+    
+    try {
+        const idUsuario = Number(req.usuario.id_usuario);
+        const idRol = Number(req.usuario.id_rol);
+
+
+
+        const resultado = await userService.obtenerUsuario(idUsuario, idRol);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Usuario obtenido correctamente',
+            datos: resultado
+        });
+
+    } catch (error) {
+        console.log(error)
+        const codigoEstatus = error.codigo || 500;
+        const mensaje = 'No se pudo obtener el usuario';
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: mensaje,
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+
+
+    
+}
+
+
+
+
+
+
+
 export const editarUsuario = async (req,res) => {
     try  {
         const idUsuario = Number(req.params.id);
@@ -329,49 +371,7 @@ export const cambiarEstado = async (req, res) => {
 
 }
 
-export const verUsuario = async (req, res) => {
-    
-    try {
-        const idUsuario = Number(req.params.id);
 
-        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
-            return res.status(400).json({
-                codigo: 400,
-                estatus: 'fail',
-                mensaje: 'ID de usuario inválido',
-                datos: null,
-                paginacion: null,
-                errores: { id: 'Debe ser un número entero mayor a cero' }
-            });
-        }
-
-        const resultado = await userService.obtenerUsuario(idUsuario);
-
-        return res.status(200).json({
-            codigo: 200,
-            estatus: 'success',
-            mensaje: 'Usuario obtenido correctamente',
-            datos: resultado
-        });
-
-    } catch (error) {
-        console.log(error)
-        const codigoEstatus = error.codigo || 500;
-        const mensaje = 'No se pudo obtener el usuario';
-
-        return res.status(codigoEstatus).json({
-            codigo: codigoEstatus,
-            estatus: 'fail',
-            mensaje: mensaje,
-            datos: null,
-            paginacion: null,
-            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
-        });
-    }
-
-
-    
-}
 
 export const obtenerUsuarios = async (req, res) => {
     try {

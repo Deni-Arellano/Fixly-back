@@ -10,4 +10,8 @@ const router = Router();
 router.post('/registrarPrestador', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.REGISTRAR_PRESTADOR), userController.registrarPrestador);
 router.post('/registrarCliente', userController.registrarCliente); // Público sin middleware
 
+//Ver perfil
+router.get('/verPerfil', authMiddleware.verificarToken, userController.verPerfil);
+
+
 export default router;

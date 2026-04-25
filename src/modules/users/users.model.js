@@ -103,3 +103,62 @@ export const insertarServicios = async (conn, { prestador_id, servicios }) => {
 
   return result;
 };
+
+export const obtenerUsuarioPorId = async (idUsuario) => {
+    const [rows] = await pool.query(
+    "SELECT id, nombre, apellido_paterno, apellido_materno, correo, telefono, foto_perfil, rol_id, estado_id, created_at FROM usuarios WHERE id = ? LIMIT 1",
+    [idUsuario]
+    );
+    return rows[0];    
+}
+
+export const obtenerPrestadorPorId = async (idUsuario) => {
+    const [rows] = await pool.query(
+    `SELECT usuarios.id,
+            usuarios.nombre,
+            usuarios.apellido_paterno,
+            usuarios.apellido_materno,
+            usuarios.correo,
+            usuarios.telefono,
+            usuarios.foto_perfil,
+            usuarios.rol_id,
+            usuarios.estado_id,
+            usuarios.created_at,
+            prestador.id AS id_prestador,
+            prestador.descripcion,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'id', servicios.id,
+                    'nombre', servicios.nombre,
+                    'descripcion', servicios.descripcion,
+                    'categoria_id', servicios.categoria_id
+                )
+            ) AS servicios
+     FROM usuarios
+     INNER JOIN prestador ON prestador.usuario_id = usuarios.id
+     LEFT JOIN prestador_servicios ON prestador_servicios.prestador_id = prestador.id
+     LEFT JOIN servicios ON servicios.id = prestador_servicios.servicio_id
+     WHERE usuarios.id = ?
+     GROUP BY usuarios.id, prestador.id`,
+    [idUsuario]
+    );
+    return rows[0];    
+}
+
+export const obtenerPromedioYComentarios = async (idPrestador) => {
+  const [[promedioRow]] = await pool.query(
+    "SELECT AVG(estrellas) AS promedio FROM calificaciones WHERE prestador_id = ?",
+    [idPrestador]
+  );
+
+  const [comentarios] = await pool.query(
+    "SELECT estrellas, comentario FROM calificaciones WHERE prestador_id = ?",
+    [idPrestador]
+  );
+
+  return {
+    promedio: promedioRow?.promedio || 0,
+    comentarios
+  };
+};
+

@@ -73,6 +73,70 @@ export const registrarPrestador = async (datosUsuario) => {
         
 }
 
+export const obtenerUsuario = async (idUsuario, id_rol) => {
+
+    if (id_rol == ROLES.CLIENTE){
+        const resultado = await userModel.obtenerUsuarioPorId(idUsuario);
+        if (!resultado){
+            const error = new Error('El usuario no existe');
+            error.codigo = 404;
+            throw error;
+        }
+
+        return resultado;
+        
+
+    } else if (id_rol == ROLES.PRESTADOR){
+        const resultadoDatosUsuario = await userModel.obtenerPrestadorPorId(idUsuario);
+        if (!resultadoDatosUsuario){
+            const error = new Error('El usuario no existe');
+            error.codigo = 404;
+            throw error;
+        }
+
+        const resultadoPromedioYCalidficaciones = await userModel.obtenerPromedioYComentarios(
+            resultadoDatosUsuario.id_prestador
+        );
+
+        const serviciosRaw = resultadoDatosUsuario.servicios;
+        let servicios = [];
+        if (serviciosRaw) {
+            servicios = typeof serviciosRaw === "string" ? JSON.parse(serviciosRaw) : serviciosRaw;
+            servicios = servicios.filter(Boolean);
+        }
+
+        return {
+            usuario: {
+                id: resultadoDatosUsuario.id,
+                nombre: resultadoDatosUsuario.nombre,
+                apellido_paterno: resultadoDatosUsuario.apellido_paterno,
+                apellido_materno: resultadoDatosUsuario.apellido_materno,
+                correo: resultadoDatosUsuario.correo,
+                telefono: resultadoDatosUsuario.telefono,
+                foto_perfil: resultadoDatosUsuario.foto_perfil,
+                rol_id: resultadoDatosUsuario.rol_id,
+                estado_id: resultadoDatosUsuario.estado_id,
+                created_at: resultadoDatosUsuario.created_at
+            },
+            prestador: {
+                id_prestador: resultadoDatosUsuario.id_prestador,
+                descripcion: resultadoDatosUsuario.descripcion,
+                servicios,
+                calificaciones: resultadoPromedioYCalidficaciones
+            }
+        };
+
+    } else {
+        const error = new Error('Rol no autorizado');
+        error.codigo = 403;
+        throw error;
+
+    }
+}
+
+
+
+///Anterior proyecto
 
 export const editarEstadoUsuario = async (idUsuarioEditar, rolAdmin, idRolAdmin, idUsuarioAdmin, estado) => {
     // Obtener el rol del usuario a editar
@@ -108,40 +172,6 @@ export const editarEstadoUsuario = async (idUsuarioEditar, rolAdmin, idRolAdmin,
     
 }
 
-export const obtenerUsuario = async (idUsuario) => {
-
-    const resultado = await userModel.obtenerUsuarioPorId(idUsuario);
-
-    if (!resultado){
-        const error = new Error('El usuario no existe');
-        error.codigo = 404;
-        throw error;
-    }
-
-    // Estructurar los datos en el formato requerido
-    const usuarioEstructurado = {
-        usuario: {
-            correo: resultado.correo,
-            verificado: resultado.verificado , 
-            id_rol: resultado.id_rol,
-            rol_nombre: resultado.rol_nombre
-        },
-        datos_personales: {
-            nombre: resultado.nombre,
-            primer_apellido: resultado.primer_apellido,
-            segundo_apellido: resultado.segundo_apellido,
-            telefono: resultado.telefono,
-            fecha_nacimiento: resultado.fecha_nacimiento,
-            rfc: resultado.rfc
-        }
-    };
-
-    if (usuarioEstructurado.usuario.id_rol !== ROLES.MIEMBRO && usuarioEstructurado.usuario.id_rol !== ROLES.INFLUENCER){
-        delete usuarioEstructurado.usuario.verificado;
-    };
-
-    return usuarioEstructurado;
-}
 
 export const obtenerUsuarios = async (idTipoFiltro, idRolUsuario) => {
     let filtro = null;

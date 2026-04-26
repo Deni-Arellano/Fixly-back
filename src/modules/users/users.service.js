@@ -152,6 +152,70 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
 }
 
 
+export const editarPerfil = async (idUsuario, idRol, datosUsuario) => {
+    const conn = await pool.getConnection();
+    try{
+        await conn.beginTransaction();
+
+        if (idRol == ROLES.CLIENTE){
+            const filasAfectadas = await userModel.editarUsuario(conn, idUsuario, datosUsuario);
+            if (!filasAfectadas){
+                const error = new Error('No se actualizó ningún dato');
+                error.codigo = 404;
+                throw error;
+            }
+            await conn.commit();
+        } else if (idRol == ROLES.PRESTADOR){
+            const filasAfectadas = await userModel.editarUsuario(conn, idUsuario, datosUsuario.usuario);
+            if (!filasAfectadas){
+                const error = new Error('No se actualizó ningún dato del usuario');
+                error.codigo = 404;
+                throw error;
+            }
+
+            const filasPrestador = await userModel.editarTablaPrestador(
+                conn,
+                idUsuario,
+                datosUsuario.datos_prestador.descripcion
+            );
+            if (!filasPrestador){
+                const error = new Error('No se actualizó ningún dato del prestador');
+                error.codigo = 404;
+                throw error;
+            }
+
+            const prestador = await userModel.obtenerIdPrestador(conn, idUsuario);
+            if (!prestador?.id){
+                const error = new Error('No se encontró el prestador');
+                error.codigo = 404;
+                throw error;
+            }
+
+            await userModel.eliminarServiciosDePrestador(conn, prestador.id);
+            await userModel.insertarServicios(conn, {
+                prestador_id: prestador.id,
+                servicios: datosUsuario.datos_prestador.servicios
+            });
+
+            await conn.commit();
+        } else{
+            const error = new Error('Rol no autorizado');
+            error.codigo = 403;
+            throw error;
+
+        }
+        
+        return {id: idUsuario};
+    } catch (error){
+        await conn.rollback();
+        throw error;
+        
+    } finally{
+        conn.release();
+    }
+}
+
+
 
 ///Anterior proyecto
 

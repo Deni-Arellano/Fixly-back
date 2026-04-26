@@ -161,132 +161,51 @@ export const verPerfil = async (req, res) => {
             errores: { general: error.message || 'Ha ocurrido un error inesperado' }
         });
     }
-
-
-    
 }
 
 
 
-
-
-
-
-export const editarUsuario = async (req,res) => {
+export const editarPerfil = async (req,res) => {
     try  {
-        const idUsuario = Number(req.params.id);
+        const idUsuario = Number(req.usuario.id_usuario);
+        const idRolUsuario = Number(req.usuario.id_rol);
+        const datosUsuario = req.body;
 
-        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
-            return res.status(400).json({
-                codigo: 400,
+        let result;
+
+        if (idRolUsuario == catalogos.ROLES.CLIENTE) {
+            result = userValidation.clienteEdicionPerfilSchema.safeParse(datosUsuario);
+        } else if (idRolUsuario == catalogos.ROLES.PRESTADOR) {
+            result = userValidation.prestadorEdicionPerfilSchema.safeParse(datosUsuario);
+        } else {
+            const error = new Error('Rol no autorizado');
+            error.codigo = 403;
+            throw error;
+        }
+
+        if (!result.success) {
+            const errores = result.error.issues.reduce((acc, err) => {
+                acc[err.path[0]] = err.message;
+                return acc;
+            }, {});
+
+            return res.status(422).json({
+                codigo: 422,
                 estatus: 'fail',
-                mensaje: 'ID de usuario inválido',
+                mensaje: 'Errores de validación.',
                 datos: null,
                 paginacion: null,
-                errores: { id: 'Debe ser un número entero mayor a cero' }
+                errores: errores
             });
         }
 
-        const [datosAEditar, tipoEdicion] = [req.body, req.tipoEdicion];
-        let resultado;
-        let result;
-        switch (tipoEdicion) {
-        case 'auto_edicion':
-            //Validación de campos
-            result = userValidation.autoEdicionSchema.safeParse(datosAEditar);
+        const resultadoUsuario = await userService.editarPerfil(idUsuario, idRolUsuario, datosUsuario);
 
-
-            if (!result.success) {
-
-                let errores = {};
-
-                errores = result.error.issues.reduce((acc, err) => {
-                    acc[err.path[0]] = err.message;
-                    return acc;
-                }, {});
-
-                return res.status(422).json({
-                    codigo: 422,
-                    estatus: 'fail',
-                    mensaje: 'Errores de validación.',
-                    datos: null,
-                    paginacion: null,
-                    errores: errores
-                });
-            }
-
-            resultado = await userService.actualizarAutoEdicion(idUsuario, datosAEditar);
-            break
-            
-        case 'superadministrador_edicion':
-
-            //Validación de campos
-            result = userValidation.superadministradorEdicionSchema.safeParse(datosAEditar);
-
-
-            if (!result.success) {
-
-                let errores = {};
-
-                errores = result.error.issues.reduce((acc, err) => {
-                    acc[err.path[0]] = err.message;
-                    return acc;
-                }, {});
-
-                return res.status(422).json({
-                    codigo: 422,
-                    estatus: 'fail',
-                    mensaje: 'Errores de validación.',
-                    datos: null,
-                    paginacion: null,
-                    errores: errores
-                });
-            }
-
-            resultado = await userService.actualizarEdicionSuperAdmin(idUsuario, datosAEditar);
-            break
-            
-        case 'administrador_edicion':
-            //Validación de campos
-            result = userValidation.administradorEdicionSchema.safeParse(datosAEditar);
-
-            if (!result.success) {
-
-                let errores = {};
-
-                errores = result.error.issues.reduce((acc, err) => {
-                    acc[err.path[0]] = err.message;
-                    return acc;
-                }, {});
-
-                return res.status(422).json({
-                    codigo: 422,
-                    estatus: 'fail',
-                    mensaje: 'Errores de validación.',
-                    datos: null,
-                    paginacion: null,
-                    errores: errores
-                });
-            }
-
-            resultado = await userService.actualizarEdicionAdmin(idUsuario, datosAEditar);
-            break
-            
-        default:
-            return res.status(400).json({
-            codigo: 400,
-            estatus: 'fail',
-            mensaje: 'No se pudo editar el usuario',
-            datos: {general: 'Tipo de edición no válido'}
-        });
-        }
-        
-        
         return res.status(200).json({
             codigo: 200,
             estatus: 'success',
             mensaje: 'Usuario actualizado correctamente',
-            datos: resultado
+            datos: resultadoUsuario
         });
 
     } catch (error){

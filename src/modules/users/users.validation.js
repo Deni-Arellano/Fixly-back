@@ -3,7 +3,7 @@ import { z } from 'zod';
 const nombreRegex = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .-]+$/;
 const telefonoRegex = /^\d{10,15}$/;
 
-
+// Registrar usuario
 const clienteSchema = z.object({
   nombre: z.string()
     .min(2, 'El nombre debe tener al menos 2 caracteres')
@@ -59,3 +59,42 @@ const integradoPrestadorSchema = z.object({
 
 export const clienteRegistroSchema = clienteSchema;
 export const prestadorRegistroSchema = integradoPrestadorSchema;
+
+
+// Editar usuario (PUT)
+const clienteEdicionSchema = z.object({
+  foto_perfil: z.string().url('La foto_perfil debe ser una URL válida').optional(),
+  nombre: z.string()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(100, 'El nombre no puede superar los 100 caracteres')
+    .regex(nombreRegex, 'Solo se permiten letras, espacios, acentos, ñ, guion, apóstrofe y punto'),
+  apellido_paterno: z.string()
+    .min(2, 'El apellido paterno debe tener al menos 2 caracteres')
+    .max(100, 'El apellido paterno no puede superar los 100 caracteres')
+    .regex(nombreRegex, 'Solo se permiten letras, espacios, acentos, ñ, guion, apóstrofe y punto'),
+  apellido_materno: z.string()
+    .min(2, 'El apellido materno debe tener al menos 2 caracteres')
+    .max(100, 'El apellido materno no puede superar los 100 caracteres')
+    .regex(nombreRegex, 'Solo se permiten letras, espacios, acentos, ñ, guion, apóstrofe y punto')
+    .optional().or(z.literal("")),
+  telefono: z.string()
+    .regex(telefonoRegex, 'El teléfono debe contener entre 10 y 15 números')
+}).strict();
+
+const prestadorEdicionSchema = z.object({
+  descripcion: z.string()
+    .min(1, 'La descripción es obligatoria'),
+  servicios: z.array(
+    z.number()
+      .int('El servicio debe ser un número entero')
+      .positive('El servicio debe ser mayor a 0')
+  ).min(1, 'Debes seleccionar al menos un servicio')
+}).strict();
+
+const integradoPrestadorEdicionSchema = z.object({
+  usuario: clienteEdicionSchema,
+  datos_prestador: prestadorEdicionSchema
+}).strict();
+
+export const clienteEdicionPerfilSchema = clienteEdicionSchema;
+export const prestadorEdicionPerfilSchema = integradoPrestadorEdicionSchema;

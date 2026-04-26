@@ -42,6 +42,7 @@ export const verificarTelefonoRepetido = async (telefono, id_usuario) => {
     
 }
 
+//Registrar usuarios
 export const verificarCorreoRepetido = async (correo) => {
     const [rows] = await pool.query(
         `SELECT correo
@@ -104,6 +105,7 @@ export const insertarServicios = async (conn, { prestador_id, servicios }) => {
   return result;
 };
 
+//Obtener usuario
 export const obtenerUsuarioPorId = async (idUsuario) => {
     const [rows] = await pool.query(
     "SELECT id, nombre, apellido_paterno, apellido_materno, correo, telefono, foto_perfil, rol_id, estado_id, created_at FROM usuarios WHERE id = ? LIMIT 1",
@@ -161,4 +163,36 @@ export const obtenerPromedioYComentarios = async (idPrestador) => {
     comentarios
   };
 };
+
+//Editar usuarios
+export const editarUsuario = async (conn, idUsuario, datos) => {
+    const [result] = await conn.query(
+        "UPDATE usuarios SET foto_perfil = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, telefono = ?  WHERE id = ?", [datos.foto_perfil, datos.nombre, datos.apellido_paterno, datos.apellido_materno, datos.telefono, idUsuario]
+    );
+    return result.affectedRows;
+}
+
+
+export const editarTablaPrestador = async (conn, idUsuario, descripcion) => {
+    const [result] = await conn.query(
+        "UPDATE prestador SET descripcion = ? WHERE usuario_id = ?", [descripcion, idUsuario]
+    );
+    return result.affectedRows;
+}
+
+
+export const obtenerIdPrestador = async (conn, idUsuario) => {
+    const [rows] = await conn.query(
+        "SELECT id FROM prestador WHERE usuario_id = ? LIMIT 1", [idUsuario]
+    );
+    return rows[0];
+}
+
+
+export const eliminarServiciosDePrestador = async (conn, idPrestador) => {
+    const [result] = await conn.query(
+        "DELETE FROM prestador_servicios WHERE prestador_id = ?", [idPrestador]
+    );
+    return result.affectedRows;
+}
 

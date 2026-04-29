@@ -92,6 +92,9 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
                     resultado.apellido_paterno,
                     resultado.apellido_materno
                 ].filter(Boolean).join(" "),
+                nombre: resultado.nombre,
+                apellido_paterno: resultado.apellido_paterno,
+                apellido_materno: resultado.apellido_materno,
                 correo: resultado.correo,
                 telefono: resultado.telefono,
                 foto_perfil: resultado.foto_perfil,
@@ -128,6 +131,9 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
                     resultadoDatosUsuario.apellido_paterno,
                     resultadoDatosUsuario.apellido_materno
                 ].filter(Boolean).join(" "),
+                nombre: resultadoDatosUsuario.nombre,
+                apellido_paterno: resultadoDatosUsuario.apellido_paterno,
+                apellido_materno: resultadoDatosUsuario.apellido_materno,
                 correo: resultadoDatosUsuario.correo,
                 telefono: resultadoDatosUsuario.telefono,
                 foto_perfil: resultadoDatosUsuario.foto_perfil,

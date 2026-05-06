@@ -163,6 +163,36 @@ export const verPerfil = async (req, res) => {
     }
 }
 
+export const verPerfilID = async (req, res) => {
+    
+    try {
+        const idUsuario = Number(req.params.id);
+
+        const resultado = await userService.obtenerUsuarioID(idUsuario);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Usuario obtenido correctamente',
+            datos: resultado
+        });
+
+    } catch (error) {
+        console.log(error)
+        const codigoEstatus = error.codigo || 500;
+        const mensaje = 'No se pudo obtener el usuario';
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: mensaje,
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}
+
 
 
 export const editarPerfil = async (req,res) => {

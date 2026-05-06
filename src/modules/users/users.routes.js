@@ -11,6 +11,7 @@ router.post('/registrarCliente', userController.registrarCliente); // Público s
 
 //Ver perfil
 router.get('/verPerfil', authMiddleware.verificarToken, userController.verPerfil);
+router.get('/verPerfil/:id', authMiddleware.verificarToken, userController.verPerfilID);
 
 //editar Cliente ( mi perfil)
 router.put('/editarPerfil', authMiddleware.verificarToken, userController.editarPerfil)

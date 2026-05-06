@@ -157,6 +157,93 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
     }
 }
 
+export const obtenerUsuarioID = async (idUsuario) => {
+    const datosUsuario = await userModel.encontrarUsuarioPorIdConRol(idUsuario);
+    const id_rol = datosUsuario.id_rol;
+
+    if (id_rol == ROLES.CLIENTE){
+        const resultado = await userModel.obtenerUsuarioPorId(idUsuario);
+        if (!resultado){
+            const error = new Error('El usuario no existe');
+            error.codigo = 404;
+            throw error;
+        }
+
+        
+
+        return {
+                id: resultado.id,
+                nombre_completo: [
+                    resultado.nombre,
+                    resultado.apellido_paterno,
+                    resultado.apellido_materno
+                ].filter(Boolean).join(" "),
+                nombre: resultado.nombre,
+                apellido_paterno: resultado.apellido_paterno,
+                apellido_materno: resultado.apellido_materno,
+                correo: resultado.correo,
+                telefono: resultado.telefono,
+                foto_perfil: resultado.foto_perfil,
+                rol_id: resultado.rol_id,
+                estado_id: resultado.estado_id,
+                created_at: resultado.created_at
+            };
+        
+
+    } else if (id_rol == ROLES.PRESTADOR){
+        const resultadoDatosUsuario = await userModel.obtenerPrestadorPorId(idUsuario);
+        if (!resultadoDatosUsuario){
+            const error = new Error('El usuario no existe');
+            error.codigo = 404;
+            throw error;
+        }
+
+        const resultadoPromedioYCalidficaciones = await userModel.obtenerPromedioYComentarios(
+            idUsuario
+        );
+
+        const serviciosRaw = resultadoDatosUsuario.servicios;
+        let servicios = [];
+        if (serviciosRaw) {
+            servicios = typeof serviciosRaw === "string" ? JSON.parse(serviciosRaw) : serviciosRaw;
+            servicios = servicios.filter(Boolean);
+        }
+
+        return {
+            usuario: {
+                id: resultadoDatosUsuario.id,
+                nombre_completo: [
+                    resultadoDatosUsuario.nombre,
+                    resultadoDatosUsuario.apellido_paterno,
+                    resultadoDatosUsuario.apellido_materno
+                ].filter(Boolean).join(" "),
+                nombre: resultadoDatosUsuario.nombre,
+                apellido_paterno: resultadoDatosUsuario.apellido_paterno,
+                apellido_materno: resultadoDatosUsuario.apellido_materno,
+                correo: resultadoDatosUsuario.correo,
+                telefono: resultadoDatosUsuario.telefono,
+                foto_perfil: resultadoDatosUsuario.foto_perfil,
+                rol_id: resultadoDatosUsuario.rol_id,
+                estado_id: resultadoDatosUsuario.estado_id,
+                created_at: resultadoDatosUsuario.created_at
+            },
+            prestador: {
+                id_prestador: resultadoDatosUsuario.id_prestador,
+                descripcion: resultadoDatosUsuario.descripcion,
+                servicios,
+                calificaciones: resultadoPromedioYCalidficaciones
+            }
+        };
+
+    } else {
+        const error = new Error('Rol no autorizado');
+        error.codigo = 403;
+        throw error;
+
+    }
+}
+
+
 
 export const editarPerfil = async (idUsuario, idRol, datosUsuario) => {
     const conn = await pool.getConnection();

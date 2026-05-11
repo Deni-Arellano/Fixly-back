@@ -67,7 +67,7 @@ export const solicitarServicio = async (req, res) => {
             codigo: 200,
             estatus: 'success',
             mensaje: 'Solicitud creada correctamente',
-            datos: resultado,
+            datos: null,
             paginacion: null,
             errores: null
             

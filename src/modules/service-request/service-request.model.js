@@ -41,3 +41,11 @@ export const obtenerSolicitudesPrestdor = async (idPrestador) => {
     );
     return rows;
 }
+
+export const solicitarServicio = async (idUsuario, datosSolicitud) => {
+    const [result] = await pool.query(
+        "INSERT INTO solicitudes (cliente_id, prestador_id, servicio_id, estado_id, descripcion, calle, numero_exterior, numero_interior, colonia, ciudad, estado, codigo_postal, referencia) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [idUsuario, datosSolicitud.prestador_id, datosSolicitud.servicio_id, 1, datosSolicitud.descripcion, datosSolicitud.calle, datosSolicitud.numero_exterior, datosSolicitud.numero_interior, datosSolicitud.colonia, datosSolicitud.ciudad, datosSolicitud.estado, datosSolicitud.codigo_postal, datosSolicitud.referencia]
+    );
+
+    return result;
+}

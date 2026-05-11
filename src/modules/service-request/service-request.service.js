@@ -19,3 +19,10 @@ export const obtenerSolicitudesParciales = async (idUsuario, idRol) => {
 
     }
 }
+
+
+export const solicitarServicio = async (idUsuario, datosSolicitud) => {
+    const resultado = await serviceRequestModel.solicitarServicio(idUsuario, datosSolicitud);
+    
+    return resultado;
+}

@@ -9,4 +9,7 @@ const router = Router();
 //Ves los datos parciales de una solicitud
 router.get('/verSolicitudes', authMiddleware.verificarToken, serviceRequestController.obtenerSolicitudesParciales);
 
+router.post('/solicitarServicio', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.SOLICITAR_SERVICIO), serviceRequestController.solicitarServicio);
+
+
 export default router;

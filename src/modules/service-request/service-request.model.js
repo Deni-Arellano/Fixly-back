@@ -29,11 +29,13 @@ export const obtenerSolicitudesPrestdor = async (idPrestador) => {
         solicitudes.estado_id, 
         estados_solicitudes.nombre as estado_solicitud, 
         solicitudes.descripcion FROM solicitudes
+    INNER JOIN prestador
+        ON solicitudes.prestador_id = prestador.id
     INNER JOIN servicios
         ON solicitudes.servicio_id = servicios.id
     INNER JOIN estados_solicitudes
         ON solicitudes.estado_id = estados_solicitudes.id
-    WHERE solicitudes.prestador_id = ?
+    WHERE prestador.usuario_id = ?
     ORDER BY solicitudes.estado_id ASC`,
     [idPrestador]
     );

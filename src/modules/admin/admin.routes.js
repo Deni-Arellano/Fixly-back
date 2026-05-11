@@ -7,4 +7,6 @@ const router = Router();
 
 router.get('/usuarios', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.VER_USUARIOS),adminController.obtenerUsuarios);
 
+router.put('/usuarios/:id/estado',authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.VER_USUARIOS), adminController.cambiarEstadoUsuario);
+
 export default router;

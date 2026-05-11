@@ -24,3 +24,20 @@ export const obtenerUsuarios = async() => {
         }
     });
 }
+
+
+
+export const cambiarEstadoUsuario = async (id_usuario, nuevoEstado) => {
+    const usuario = await adminModel.obtenerUsuarioPorId(id_usuario);
+
+    if (!usuario) {
+        const error = new Error('Usuario no encontrado');
+        error.codigo = 404;
+        throw error;
+    }
+
+    const resultado = await adminModel.actualizarEstadoUsuario(id_usuario, nuevoEstado);
+
+    return resultado;
+
+}

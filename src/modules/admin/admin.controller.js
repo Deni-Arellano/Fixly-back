@@ -115,3 +115,59 @@ export const cambiarEstadoUsuario = async(req, res) => {
         });
     }
 }
+
+
+
+export const buscarUsuarios = async(req, res) => {
+    try {
+        const { busqueda } = req.query;
+
+        if (!busqueda || busqueda.trim() === '') {
+            return res.status(422).json({
+                codigo: 422,
+                estatus: 'fail',
+                mensaje: 'El parámetro de búsqueda es requerido',
+                datos: null,
+                paginacion: null, 
+                errores: { busqueda: 'Parámetro requerido'}
+            })
+        }
+
+        const usuarios = await adminService.buscarUsuarios(busqueda);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Usuarios encontrados correctamente',
+            datos: usuarios,
+            paginacion: null,
+            errores: null
+        });
+        
+
+    } catch (error) {
+        console.log(error)
+        const codigoEstatus = error.codigo || 500;
+        const mensaje = 'No se pudo actualizar el estado del usuario';
+
+        if (codigoEstatus === 404) {
+            return res.status(404).json({
+                codigo: 404,
+                estatus: 'fail',
+                mensaje: 'Usuario no encontrado',
+                datos: null,
+                paginacion: null,
+                errores: { categoria_id: error.message }
+            });
+        }
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: 'No se pudo actualizar el estado del usuario',
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}

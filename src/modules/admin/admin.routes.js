@@ -9,4 +9,7 @@ router.get('/usuarios', authMiddleware.verificarToken, authMiddleware.autorizarR
 
 router.put('/usuarios/:id/estado',authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.VER_USUARIOS), adminController.cambiarEstadoUsuario);
 
+
+router.get('/usuarios/busqueda', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.VER_USUARIOS), adminController.buscarUsuarios);
+
 export default router;

@@ -11,5 +11,6 @@ router.get('/verSolicitudes', authMiddleware.verificarToken, serviceRequestContr
 
 router.post('/solicitarServicio', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.SOLICITAR_SERVICIO), serviceRequestController.solicitarServicio);
 
+router.get('/verDetalleSolicitud/:id', authMiddleware.verificarToken, serviceRequestController.obtenerDetalleSolicitud);
 
 export default router;

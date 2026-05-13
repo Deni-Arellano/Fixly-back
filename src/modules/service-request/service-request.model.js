@@ -49,3 +49,78 @@ export const solicitarServicio = async (idUsuario, datosSolicitud) => {
 
     return result;
 }
+
+
+
+export const obtenerDetalleSolicitudCliente = async (idSolicitud, idCliente) => {
+    const [rows] = await pool.query(
+         `SELECT 
+            s.id,
+            s.servicio_id,
+            sv.nombre as nombre_servicio,
+            s.estado_id,
+            es.nombre as estado_solicitud,
+            s.descripcion,
+            s.calle,
+            s.numero_exterior,
+            s.numero_interior,
+            s.colonia,
+            s.ciudad,
+            s.estado,
+            s.codigo_postal,
+            s.referencia,
+            s.created_at,
+            -- Datos del prestador
+            u.nombre as nombre_prestador,
+            u.apellido_paterno,
+            u.apellido_materno,
+            u.foto_perfil,
+            u.telefono
+        FROM solicitudes s
+        INNER JOIN servicios sv ON s.servicio_id = sv.id
+        INNER JOIN estados_solicitudes es ON s.estado_id = es.id
+        INNER JOIN prestador p ON s.prestador_id = p.id
+        INNER JOIN usuarios u ON p.usuario_id = u.id
+        WHERE s.id = ? AND s.cliente_id = ?`,
+        [idSolicitud, idCliente]
+    );
+
+    return rows[0];
+
+}
+
+
+export const obtenerDetalleSolicitudPrestador = async (idSolicitud, idPrestador) => {
+    const [rows] = await pool.query(
+        `SELECT 
+            s.id,
+            s.servicio_id,
+            sv.nombre as nombre_servicio,
+            s.estado_id,
+            es.nombre as estado_solicitud,
+            s.descripcion,
+            s.calle,
+            s.numero_exterior,
+            s.numero_interior,
+            s.colonia,
+            s.ciudad,
+            s.estado,
+            s.codigo_postal,
+            s.referencia,
+            s.created_at,
+            -- Datos del cliente
+            u.nombre as nombre_cliente,
+            u.apellido_paterno,
+            u.apellido_materno,
+            u.foto_perfil,
+            u.telefono
+        FROM solicitudes s
+        INNER JOIN servicios sv ON s.servicio_id = sv.id
+        INNER JOIN estados_solicitudes es ON s.estado_id = es.id
+        INNER JOIN prestador p ON s.prestador_id = p.id
+        INNER JOIN usuarios u ON s.cliente_id = u.id
+        WHERE s.id = ? AND p.usuario_id = ?`,
+        [idSolicitud, idPrestador]
+    );
+    return rows[0] || null;
+}

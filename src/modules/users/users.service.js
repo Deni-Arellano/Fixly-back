@@ -308,3 +308,52 @@ export const editarPerfil = async (idUsuario, idRol, datosUsuario) => {
     }
 }
 
+export const obtenerDatosPrestador = async (idPrestador) => {
+    const datos = await userModel.obtenerPrestadorConCalificaciones(idPrestador);
+    
+    if (!datos) {
+        const error = new Error('Prestador no encontrado');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    let servicios = [];
+    if (datos.servicios) {
+        try {
+            const serviciosArray = typeof datos.servicios === 'string' 
+                ? JSON.parse(datos.servicios) 
+                : datos.servicios;
+            servicios = Array.isArray(serviciosArray) 
+                ? serviciosArray.filter(s => s && s.id !== null)
+                : [];
+        } catch (e) {
+            servicios = [];
+        }
+    }
+    
+    return {
+        usuario: {
+            id: datos.id,
+            nombre_completo: `${datos.nombre} ${datos.apellido_paterno} ${datos.apellido_materno}`.trim(),
+            nombre: datos.nombre,
+            apellido_paterno: datos.apellido_paterno,
+            apellido_materno: datos.apellido_materno,
+            correo: datos.correo,
+            telefono: datos.telefono,
+            foto_perfil: datos.foto_perfil,
+            rol_id: datos.rol_id,
+            estado_id: datos.estado_id,
+            created_at: datos.created_at
+        },
+        prestador: {
+            id_prestador: datos.id_prestador,
+            descripcion: datos.descripcion,
+            servicios: servicios,
+            calificaciones: {
+                promedio: datos.calificaciones.promedio,
+                comentarios: datos.calificaciones.comentarios
+            }
+        }
+    };
+}
+

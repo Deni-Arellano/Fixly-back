@@ -196,3 +196,58 @@ export const eliminarServiciosDePrestador = async (conn, idPrestador) => {
     return result.affectedRows;
 }
 
+export const obtenerPrestadorConCalificaciones = async (idPrestador) => {
+    const [rows] = await pool.query(
+        `SELECT usuarios.id,
+                usuarios.nombre,
+                usuarios.apellido_paterno,
+                usuarios.apellido_materno,
+                usuarios.correo,
+                usuarios.telefono,
+                usuarios.foto_perfil,
+                usuarios.rol_id,
+                usuarios.estado_id,
+                usuarios.created_at,
+                prestador.id AS id_prestador,
+                prestador.descripcion,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'id', servicios.id,
+                        'nombre', servicios.nombre,
+                        'descripcion', servicios.descripcion,
+                        'categoria_id', servicios.categoria_id
+                    )
+                ) AS servicios
+         FROM usuarios
+         INNER JOIN prestador ON prestador.usuario_id = usuarios.id
+         LEFT JOIN prestador_servicios ON prestador_servicios.prestador_id = prestador.id
+         LEFT JOIN servicios ON servicios.id = prestador_servicios.servicio_id
+         WHERE prestador.id = ?
+         GROUP BY usuarios.id, prestador.id`,
+        [idPrestador]
+    );
+    
+    if (!rows[0]) {
+        return null;
+    }
+    
+
+    const [calificaciones] = await pool.query(
+        `SELECT AVG(estrellas) as promedio, GROUP_CONCAT(comentario SEPARATOR '||') as comentarios
+         FROM calificaciones
+         WHERE prestador_id = ?`,
+        [idPrestador]
+    );
+    
+    const datos = rows[0];
+    const promedio = calificaciones[0]?.promedio || 0;
+    const comentariosStr = calificaciones[0]?.comentarios || '';
+    
+    datos.calificaciones = {
+        promedio: promedio ? parseFloat(parseFloat(promedio).toFixed(2)) : 0,
+        comentarios: comentariosStr ? comentariosStr.split('||').filter(c => c !== null && c !== '') : []
+    };
+    
+    return datos;
+};
+

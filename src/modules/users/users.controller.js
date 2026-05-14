@@ -257,3 +257,34 @@ export const editarPerfil = async (req,res) => {
     }
     
 }
+
+export const obtenerDatosPrestador = async (req, res) => {
+    try {
+        const idPrestador = Number(req.params.id);
+
+        const datos = await userService.obtenerDatosPrestador(idPrestador);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Datos del prestador obtenidos correctamente',
+            datos: datos,
+            paginacion: null,
+            errores: null
+        });
+
+    } catch (error) {
+        console.log(error);
+        const codigoEstatus = error.codigo || 500;
+        const mensaje = 'Error al obtener los datos del prestador';
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: mensaje,
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}

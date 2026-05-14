@@ -221,3 +221,41 @@ export const finalizarSolicitud = async (idSolicitud, idPrestadorUsuario) => {
     
     return { mensaje: 'Solicitud finalizada correctamente' };
 }
+
+
+
+
+export const editarSolicitud = async (idSolicitud, idCliente, datosSolicitud) => {
+    
+    const solicitud = await serviceRequestModel.obtenerSolicitudPorId(idSolicitud);
+    
+    if (!solicitud) {
+        const error = new Error('Solicitud no encontrada');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    if (solicitud.cliente_id !== idCliente) {
+        const error = new Error('No tienes permiso para editar esta solicitud');
+        error.codigo = 403;
+        throw error;
+    }
+    
+    
+    if (solicitud.estado_id !== 1) {
+        const error = new Error('Solo se pueden editar solicitudes en estado PENDIENTE');
+        error.codigo = 422;
+        throw error;
+    }
+    
+    
+    const resultado = await serviceRequestModel.actualizarSolicitud(idSolicitud, datosSolicitud);
+    
+    if (resultado.affectedRows === 0) {
+        const error = new Error('No se pudo actualizar la solicitud');
+        error.codigo = 400;
+        throw error;
+    }
+    
+    return { mensaje: 'Solicitud actualizada correctamente' };
+}

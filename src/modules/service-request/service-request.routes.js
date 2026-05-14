@@ -19,4 +19,6 @@ router.put('/:id/aceptar', authMiddleware.verificarToken, authMiddleware.autoriz
 
 router.put('/:id/finalizar', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.FINALIZAR_SOLICITUD), serviceRequestController.finalizarSolicitud);
 
+router.put('/editarSolicitud/:id', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.EDITAR_SOLICITUD), serviceRequestController.editarSolicitud);
+
 export default router;

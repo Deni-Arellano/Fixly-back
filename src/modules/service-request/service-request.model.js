@@ -160,3 +160,68 @@ export const actualizarEstadoSolicitud = async (idSolicitud, nuevoEstadoId) => {
     );
     return result;
 }
+
+
+
+export const actualizarSolicitud = async (idSolicitud, datosSolicitud) => {
+    
+    const campos = [];
+    const valores = [];
+
+    if (datosSolicitud.calle !== undefined) {
+        campos.push('calle = ?');
+        valores.push(datosSolicitud.calle);
+    }
+
+    if (datosSolicitud.numero_exterior !== undefined) {
+        campos.push('numero_exterior = ?');
+        valores.push(datosSolicitud.numero_exterior);
+    }
+
+    if (datosSolicitud.numero_interior !== undefined) {
+        campos.push('numero_interior = ?');
+        valores.push(datosSolicitud.numero_interior || null);
+    }
+
+    if (datosSolicitud.colonia !== undefined) {
+        campos.push('colonia = ?');
+        valores.push(datosSolicitud.colonia);
+    }
+
+    if (datosSolicitud.ciudad !== undefined) {
+        campos.push('ciudad = ?');
+        valores.push(datosSolicitud.ciudad);
+    }
+
+    if (datosSolicitud.estado !== undefined) {
+        campos.push('estado = ?');
+        valores.push(datosSolicitud.estado);
+    }
+
+    if (datosSolicitud.codigo_postal !== undefined) {
+        campos.push('codigo_postal = ?');
+        valores.push(datosSolicitud.codigo_postal);
+    }
+
+    if (datosSolicitud.referencia !== undefined) {
+        campos.push('referencia = ?');
+        valores.push(datosSolicitud.referencia || null);
+    }
+
+    if (datosSolicitud.descripcion !== undefined) {
+        campos.push('descripcion = ?');
+        valores.push(datosSolicitud.descripcion || null);
+    }
+
+    
+    if (campos.length === 0) {
+        return { affectedRows: 0 };
+    }
+
+    valores.push(idSolicitud);
+
+    const query = `UPDATE solicitudes SET ${campos.join(', ')} WHERE id = ?`;
+    const [result] = await pool.query(query, valores);
+
+    return result;
+}

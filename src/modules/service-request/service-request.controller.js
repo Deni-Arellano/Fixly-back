@@ -146,3 +146,132 @@ export const obtenerDetalleSolicitud = async (req, res) => {
         });
     }
 }
+
+
+export const cancelarSolicitud = async (req, res) => {
+    try {
+        const idSolicitud = Number(req.params.id);
+        const idCliente = Number(req.usuario.id_usuario);
+
+        if (isNaN(idSolicitud)) {
+            return res.status(422).json({
+                codigo: 422, 
+                estatus: 'fail',
+                mensaje: 'ID de solicitud inválido',
+                datos: null,
+                paginacion: null,
+                errores: { id: 'El ID de la solicitud debe ser un número' }
+            });
+        }
+
+        await serviceRequestService.cancelarSolicitud(idSolicitud, idCliente);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Solicitud cancelada correctamente',
+            datos: null,
+            paginacion: null,
+            errores: null
+        });
+
+    } catch (error) {
+        console.log(error);
+        const codigoEstatus = error.codigo || 500;
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: error.message || 'Error al cancelar la solicitud',
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}
+
+
+export const aceptarSolicitud = async (req, res) => {
+    try {
+        const idSolicitud = Number(req.params.id);
+        const idPrestadorUsuario = Number(req.usuario.id_usuario);
+
+        if (isNaN(idSolicitud)) {
+            return res.status(422).json({
+                codigo: 422, 
+                estatus: 'fail',
+                mensaje: 'ID de solicitud inválido',
+                datos: null,
+                paginacion: null,
+                errores: { id: 'El ID de la solicitud debe ser un número' }
+            });
+        }
+
+        await serviceRequestService.aceptarSolicitud(idSolicitud, idPrestadorUsuario);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Solicitud aceptada correctamente',
+            datos: null,
+            paginacion: null,
+            errores: null
+        });
+
+    } catch (error) {
+        console.log(error);
+        const codigoEstatus = error.codigo || 500;
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: error.message || 'Error al aceptar la solicitud',
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}
+
+
+export const finalizarSolicitud = async (req, res) => {
+    try {
+        const idSolicitud = Number(req.params.id);
+        const idPrestadorUsuario = Number(req.usuario.id_usuario);
+
+        if (isNaN(idSolicitud)) {
+            return res.status(422).json({
+                codigo: 422, 
+                estatus: 'fail',
+                mensaje: 'ID de solicitud inválido',
+                datos: null,
+                paginacion: null,
+                errores: { id: 'El ID de la solicitud debe ser un número' }
+            });
+        }
+
+        await serviceRequestService.finalizarSolicitud(idSolicitud, idPrestadorUsuario);
+
+        return res.status(200).json({
+            codigo: 200,
+            estatus: 'success',
+            mensaje: 'Solicitud finalizada correctamente',
+            datos: null,
+            paginacion: null,
+            errores: null
+        });
+
+    } catch (error) {
+        console.log(error);
+        const codigoEstatus = error.codigo || 500;
+
+        return res.status(codigoEstatus).json({
+            codigo: codigoEstatus,
+            estatus: 'fail',
+            mensaje: error.message || 'Error al finalizar la solicitud',
+            datos: null,
+            paginacion: null,
+            errores: { general: error.message || 'Ha ocurrido un error inesperado' }
+        });
+    }
+}

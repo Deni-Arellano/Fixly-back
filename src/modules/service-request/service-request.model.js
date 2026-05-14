@@ -124,3 +124,39 @@ export const obtenerDetalleSolicitudPrestador = async (idSolicitud, idPrestador)
     );
     return rows[0] || null;
 }
+
+
+
+
+export const obtenerSolicitudPorId = async (idSolicitud) => {
+    const [rows] = await pool.query(
+        `SELECT 
+            s.id,
+            s.cliente_id,
+            s.prestador_id,
+            s.estado_id,
+            s.created_at
+        FROM solicitudes s
+        WHERE s.id = ?`,
+        [idSolicitud]
+    );
+    return rows[0] || null;
+}
+
+
+export const obtenerIdPrestadorPorUsuario = async (idUsuario) => {
+    const [rows] = await pool.query(
+        "SELECT id FROM prestador WHERE usuario_id = ?",
+        [idUsuario]
+    );
+    return rows[0]?.id || null;
+}
+
+
+export const actualizarEstadoSolicitud = async (idSolicitud, nuevoEstadoId) => {
+    const [result] = await pool.query(
+        "UPDATE solicitudes SET estado_id = ? WHERE id = ?",
+        [nuevoEstadoId, idSolicitud]
+    );
+    return result;
+}

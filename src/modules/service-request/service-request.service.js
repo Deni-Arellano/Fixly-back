@@ -119,3 +119,105 @@ export const obtenerDetalleSolicitud = async (idSolicitud, idUsuario, idRol) => 
         throw error;
     }
 }
+
+
+
+export const cancelarSolicitud = async (idSolicitud, idCliente) => {
+  
+    const solicitud = await serviceRequestModel.obtenerSolicitudPorId(idSolicitud);
+    
+    if (!solicitud) {
+        const error = new Error('Solicitud no encontrada');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    if (solicitud.cliente_id !== idCliente) {
+        const error = new Error('No tienes permiso para cancelar esta solicitud');
+        error.codigo = 403;
+        throw error;
+    }
+    
+    if (solicitud.estado_id !== 1) {
+        const error = new Error('Solo se pueden cancelar solicitudes en estado PENDIENTE');
+        error.codigo = 422;
+        throw error;
+    }
+    
+    await serviceRequestModel.actualizarEstadoSolicitud(idSolicitud, 4);
+    
+    return { mensaje: 'Solicitud cancelada correctamente' };
+}
+
+
+export const aceptarSolicitud = async (idSolicitud, idPrestadorUsuario) => {
+    const solicitud = await serviceRequestModel.obtenerSolicitudPorId(idSolicitud);
+    
+    if (!solicitud) {
+        const error = new Error('Solicitud no encontrada');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    if (solicitud.estado_id !== 1) {
+        const error = new Error('Solo se pueden aceptar solicitudes en estado PENDIENTE');
+        error.codigo = 422;
+        throw error;
+    }
+    
+
+    const idPrestador = await serviceRequestModel.obtenerIdPrestadorPorUsuario(idPrestadorUsuario);
+    
+    if (!idPrestador) {
+        const error = new Error('No se encontró el perfil de prestador');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    if (solicitud.prestador_id !== idPrestador) {
+        const error = new Error('No tienes permiso para aceptar esta solicitud');
+        error.codigo = 403;
+        throw error;
+    }
+    
+    await serviceRequestModel.actualizarEstadoSolicitud(idSolicitud, 2);
+    
+    return { mensaje: 'Solicitud aceptada correctamente' };
+}
+
+
+export const finalizarSolicitud = async (idSolicitud, idPrestadorUsuario) => {
+    const solicitud = await serviceRequestModel.obtenerSolicitudPorId(idSolicitud);
+    
+    if (!solicitud) {
+        const error = new Error('Solicitud no encontrada');
+        error.codigo = 404;
+        throw error;
+    }
+    
+    if (solicitud.estado_id !== 2) {
+        const error = new Error('Solo se pueden finalizar solicitudes en estado ACEPTADA');
+        error.codigo = 422;
+        throw error;
+    }
+    
+    const idPrestador = await serviceRequestModel.obtenerIdPrestadorPorUsuario(idPrestadorUsuario);
+    
+    if (!idPrestador) {
+        const error = new Error('No se encontró el perfil de prestador');
+        error.codigo = 404;
+        throw error;
+    }
+    
+
+    if (solicitud.prestador_id !== idPrestador) {
+        const error = new Error('No tienes permiso para finalizar esta solicitud');
+        error.codigo = 403;
+        throw error;
+    }
+    
+
+    await serviceRequestModel.actualizarEstadoSolicitud(idSolicitud, 3);
+    
+    return { mensaje: 'Solicitud finalizada correctamente' };
+}

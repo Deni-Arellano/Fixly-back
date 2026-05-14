@@ -17,7 +17,8 @@ export const registrarCliente = async (req, res) => {
             let errores = {};
 
             errores = result.error.issues.reduce((acc, err) => {
-                acc[err.path[0]] = err.message;
+                const campo = err.path.length ? err.path[err.path.length - 1] : 'general';
+                acc[campo] = err.message;
                 return acc;
             }, {});
 
@@ -81,7 +82,8 @@ export const registrarPrestador = async (req, res) => {
             let errores = {};
 
             errores = result.error.issues.reduce((acc, err) => {
-                acc[err.path[0]] = err.message;
+                const campo = err.path.length ? err.path[err.path.length - 1] : 'general';
+                acc[campo] = err.message;
                 return acc;
             }, {});
 
@@ -215,7 +217,8 @@ export const editarPerfil = async (req,res) => {
 
         if (!result.success) {
             const errores = result.error.issues.reduce((acc, err) => {
-                acc[err.path[0]] = err.message;
+                const campo = err.path.length ? err.path[err.path.length - 1] : 'general';
+                acc[campo] = err.message;
                 return acc;
             }, {});
 

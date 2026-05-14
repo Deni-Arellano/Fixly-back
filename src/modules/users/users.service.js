@@ -113,7 +113,7 @@ export const obtenerUsuario = async (idUsuario, id_rol) => {
         }
 
         const resultadoPromedioYCalidficaciones = await userModel.obtenerPromedioYComentarios(
-            idUsuario
+            resultadoDatosUsuario.id_prestador
         );
 
         const serviciosRaw = resultadoDatosUsuario.servicios;
@@ -199,7 +199,7 @@ export const obtenerUsuarioID = async (idUsuario) => {
         }
 
         const resultadoPromedioYCalidficaciones = await userModel.obtenerPromedioYComentarios(
-            idUsuario
+            resultadoDatosUsuario.id_prestador
         );
 
         const serviciosRaw = resultadoDatosUsuario.servicios;

@@ -1,5 +1,23 @@
 import * as adminModel from './admin.model.js';
-import { ROLES } from '../../config/catalogos.js';
+import { ROLES, ESTADOS_USUARIO } from '../../config/catalogos.js';
+
+
+const mapearRol = (rolId) => {
+    const rolesMap = {
+        [ROLES.ADMIN]: 'Admin',
+        [ROLES.PRESTADOR]: 'Prestador',
+        [ROLES.CLIENTE]: 'Cliente'
+    };
+    return rolesMap[rolId] || 'Desconocido';
+};
+
+const mapearEstado = (estadoId) => {
+    const estadosMap = {
+        [ESTADOS_USUARIO.ACTIVO]: 'Activo',
+        [ESTADOS_USUARIO.SUSPENDIDO]: 'Suspendido'
+    };
+    return estadosMap[estadoId] || 'Desconocido';
+};
 
 export const obtenerUsuarios = async() => {
     const usuarios = await adminModel.obtenerUsuarios();
@@ -21,7 +39,9 @@ export const obtenerUsuarios = async() => {
             correo: usuario.correo,
             telefono: usuario.telefono,
             rol_id: usuario.rol_id,
-            estado_id: usuario.estado_id
+            estado_id: usuario.estado_id,
+            rol: mapearRol(usuario.rol_id),
+            estado: mapearEstado(usuario.estado_id)
         }
     });
 }
@@ -71,7 +91,9 @@ export const buscarUsuarios = async(busqueda) => {
             correo: usuario.correo,
             telefono: usuario.telefono,
             rol_id: usuario.rol_id,
-            estado_id: usuario.estado_id
+            estado_id: usuario.estado_id,
+            rol: mapearRol(usuario.rol_id),
+            estado: mapearEstado(usuario.estado_id)
         }
     });
 

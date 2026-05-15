@@ -172,6 +172,14 @@ export const editarUsuario = async (conn, idUsuario, datos) => {
     return result.affectedRows;
 }
 
+export const actualizarContrasena = async (idUsuario, contrasenaHash) => {
+    const [result] = await pool.query(
+        "UPDATE usuarios SET password = ? WHERE id = ?",
+        [contrasenaHash, idUsuario]
+    );
+    return result.affectedRows;
+}
+
 
 export const editarTablaPrestador = async (conn, idUsuario, descripcion) => {
     const [result] = await conn.query(
@@ -256,3 +264,24 @@ export const obtenerPrestadorConCalificaciones = async (idPrestador) => {
     return datos;
 };
 
+
+export const obtenerUsuarioPorIdPassword = async (idUsuario) => {
+    const [rows] = await pool.query(
+    "SELECT id, nombre, apellido_paterno, apellido_materno, correo, password, telefono, foto_perfil, rol_id, estado_id, created_at FROM usuarios WHERE id = ? LIMIT 1",
+    [idUsuario]
+    );
+    return rows[0];    
+}
+
+
+export const encontrarUsuarioPorIdConRolPassword = async (id) => {
+    const [rows] = await pool.query(
+        `SELECT usuarios.id, usuarios.correo, usuarios.estado_id,
+                roles.id as id_rol, roles.nombre as rol_nombre
+         FROM usuarios 
+         INNER JOIN roles ON usuarios.rol_id = roles.id
+         WHERE usuarios.id = ? LIMIT 1`,
+        [id]
+    );
+    return rows[0];
+}

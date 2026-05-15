@@ -51,3 +51,31 @@ export const generarToken = (usuario) => {
     return token;
 }
 
+export const cambiarContraseñaService = async (idUsuario, contrasenaActual, contrasenaNueva) => {
+    
+    const usuario = await userModel.obtenerUsuarioPorIdPassword(idUsuario);
+    
+    if (!usuario) {
+        const error = new Error('Usuario no encontrado');
+        error.codigo = 404;
+        throw error;
+    }
+
+    
+    const esCorrecta = await bcrypt.compare(contrasenaActual, usuario.password);
+
+    if (!esCorrecta) {
+        const error = new Error('La contraseña actual es incorrecta');
+        error.codigo = 401;
+        throw error;
+    }
+
+    
+    const contrasenaNuevaHash = await bcrypt.hash(contrasenaNueva, 12);
+
+
+    await userModel.actualizarContrasena(idUsuario, contrasenaNuevaHash);
+
+    return { mensaje: 'Contraseña actualizada correctamente' };
+}
+

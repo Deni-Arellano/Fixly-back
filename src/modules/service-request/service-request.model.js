@@ -144,6 +144,15 @@ export const obtenerSolicitudPorId = async (idSolicitud) => {
 }
 
 
+export const verificarSolicitudCalificada = async (idSolicitud) => {
+    const [rows] = await pool.query(
+        `SELECT id FROM calificaciones WHERE solicitud_id = ? LIMIT 1`,
+        [idSolicitud]
+    );
+    return rows.length > 0;
+}
+
+
 export const obtenerIdPrestadorPorUsuario = async (idUsuario) => {
     const [rows] = await pool.query(
         "SELECT id FROM prestador WHERE usuario_id = ?",

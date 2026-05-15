@@ -48,6 +48,15 @@ const formatearDetalleSolicitud = (datos, tipoUsuario) => {
         estado_solicitud: datos.estado_solicitud,
         descripcion: datos.descripcion,
         direccion: formatearDireccion(datos),
+        
+        calle: datos.calle,
+        numero_exterior: datos.numero_exterior,
+        numero_interior: datos.numero_interior,
+        colonia: datos.colonia,
+        ciudad: datos.ciudad,
+        estado: datos.estado,
+        codigo_postal: datos.codigo_postal,
+    
         referencia: datos.referencia,
         creado_en: formatearFecha(datos.created_at)
     };
@@ -258,4 +267,33 @@ export const editarSolicitud = async (idSolicitud, idCliente, datosSolicitud) =>
     }
     
     return { mensaje: 'Solicitud actualizada correctamente' };
+}
+
+
+export const verificarSolicitudCalificada = async (idSolicitud, idUsuario, idRol) => {
+    if (idRol == catalogos.ROLES.CLIENTE) {
+        const datos = await serviceRequestModel.obtenerDetalleSolicitudCliente(idSolicitud, idUsuario);
+
+        if (!datos) {
+            const error = new Error('Solicitud no encontrada');
+            error.codigo = 404;
+            throw error;
+        }
+    } else if (idRol == catalogos.ROLES.PRESTADOR) {
+        const datos = await serviceRequestModel.obtenerDetalleSolicitudPrestador(idSolicitud, idUsuario);
+
+        if (!datos) {
+            const error = new Error('Solicitud no encontrada');
+            error.codigo = 404;
+            throw error;
+        }
+    } else {
+        const error = new Error('Rol no autorizado');
+        error.codigo = 403;
+        throw error;
+    }
+
+    const calificada = await serviceRequestModel.verificarSolicitudCalificada(idSolicitud);
+
+    return { calificada: calificada };
 }

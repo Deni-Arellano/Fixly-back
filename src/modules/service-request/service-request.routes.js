@@ -13,6 +13,8 @@ router.post('/solicitarServicio', authMiddleware.verificarToken, authMiddleware.
 
 router.get('/verDetalleSolicitud/:id', authMiddleware.verificarToken, serviceRequestController.obtenerDetalleSolicitud);
 
+router.get('/:id/calificada', authMiddleware.verificarToken, serviceRequestController.verificarSolicitudCalificada);
+
 router.put('/:id/cancelar', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.CANCELAR_SOLICITUD), serviceRequestController.cancelarSolicitud);
 
 router.put('/:id/aceptar', authMiddleware.verificarToken, authMiddleware.autorizarRol(permisos.PERMISOS.ACEPTAR_SOLICITUD), serviceRequestController.aceptarSolicitud);

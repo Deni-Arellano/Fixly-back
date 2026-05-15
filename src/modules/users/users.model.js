@@ -233,7 +233,12 @@ export const obtenerPrestadorConCalificaciones = async (idPrestador) => {
     
 
     const [calificaciones] = await pool.query(
-        `SELECT AVG(estrellas) as promedio, GROUP_CONCAT(comentario SEPARATOR '||') as comentarios
+        `SELECT AVG(estrellas) as promedio, JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'estrellas', estrellas,
+                'comentario', comentario
+            )
+        ) as comentarios
          FROM calificaciones
          WHERE prestador_id = ?`,
         [idPrestador]
@@ -241,11 +246,11 @@ export const obtenerPrestadorConCalificaciones = async (idPrestador) => {
     
     const datos = rows[0];
     const promedio = calificaciones[0]?.promedio || 0;
-    const comentariosStr = calificaciones[0]?.comentarios || '';
+    const comentariosData = calificaciones[0]?.comentarios || '[]';
     
     datos.calificaciones = {
-        promedio: promedio ? parseFloat(parseFloat(promedio).toFixed(2)) : 0,
-        comentarios: comentariosStr ? comentariosStr.split('||').filter(c => c !== null && c !== '') : []
+        promedio: promedio ? parseFloat(parseFloat(promedio).toFixed(4)) : 0,
+        comentarios: typeof comentariosData === 'string' ? JSON.parse(comentariosData) : comentariosData
     };
     
     return datos;

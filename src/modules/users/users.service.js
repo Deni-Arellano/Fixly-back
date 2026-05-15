@@ -334,7 +334,11 @@ export const obtenerDatosPrestador = async (idPrestador) => {
     return {
         usuario: {
             id: datos.id,
-            nombre_completo: `${datos.nombre} ${datos.apellido_paterno} ${datos.apellido_materno}`.trim(),
+            nombre_completo: [
+                datos.nombre,
+                datos.apellido_paterno,
+                datos.apellido_materno
+            ].filter(Boolean).join(" "),
             nombre: datos.nombre,
             apellido_paterno: datos.apellido_paterno,
             apellido_materno: datos.apellido_materno,
@@ -348,11 +352,8 @@ export const obtenerDatosPrestador = async (idPrestador) => {
         prestador: {
             id_prestador: datos.id_prestador,
             descripcion: datos.descripcion,
-            servicios: servicios,
-            calificaciones: {
-                promedio: datos.calificaciones.promedio,
-                comentarios: datos.calificaciones.comentarios
-            }
+            servicios,
+            calificaciones: datos.calificaciones
         }
     };
 }

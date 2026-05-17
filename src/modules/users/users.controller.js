@@ -1,6 +1,7 @@
 import * as userValidation from './users.validation.js';
 import * as userService from "./users.service.js";
 import * as catalogos from "../../config/catalogos.js";
+import { subirImagenBuffer } from "../../utils/cloudinary.js";
 
 
 export const registrarCliente = async (req, res) => {
@@ -201,7 +202,44 @@ export const editarPerfil = async (req,res) => {
     try  {
         const idUsuario = Number(req.usuario.id_usuario);
         const idRolUsuario = Number(req.usuario.id_rol);
-        const datosUsuario = req.body;
+        const datosUsuario = { ...req.body };
+
+        try {
+            if (typeof datosUsuario.usuario === 'string') {
+                datosUsuario.usuario = JSON.parse(datosUsuario.usuario);
+            }
+            if (typeof datosUsuario.datos_prestador === 'string') {
+                datosUsuario.datos_prestador = JSON.parse(datosUsuario.datos_prestador);
+            }
+            if (datosUsuario?.datos_prestador?.servicios && typeof datosUsuario.datos_prestador.servicios === 'string') {
+                datosUsuario.datos_prestador.servicios = JSON.parse(datosUsuario.datos_prestador.servicios);
+            }
+
+            if (idRolUsuario == catalogos.ROLES.CLIENTE && datosUsuario.usuario) {
+                Object.assign(datosUsuario, datosUsuario.usuario);
+                delete datosUsuario.usuario;
+            }
+
+        } catch (error) {
+            const parseError = new Error('Formato JSON invalido en el body');
+            parseError.codigo = 400;
+            throw parseError;
+        }
+
+        if (req.file?.buffer) {
+            const resultadoUpload = await subirImagenBuffer(req.file.buffer, {
+                public_id: `user-${idUsuario}-profile`,
+                overwrite: true,
+                invalidate: true
+            });
+
+            if (idRolUsuario == catalogos.ROLES.CLIENTE) {
+                datosUsuario.foto_perfil = resultadoUpload.secure_url;
+            } else if (idRolUsuario == catalogos.ROLES.PRESTADOR) {
+                datosUsuario.usuario = datosUsuario.usuario || {};
+                datosUsuario.usuario.foto_perfil = resultadoUpload.secure_url;
+            }
+        }
 
         let result;
 

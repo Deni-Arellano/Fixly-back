@@ -7,10 +7,10 @@
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-![License](https://img.shields.io/badge/License-ISC-blue?style=for-the-badge)
+
 
 <p align="center">
-  <b>API RESTful robusta para la gestión y contratación de servicios y oficios profesionales a domicilio (Fixly).</b>
+  <b>API RESTful para la gestión y contratación de servicios y oficios profesionales a domicilio (Fixly).</b>
   <br />
   Diseñada para alimentar clientes móviles (Android) y web con arquitectura modular, control de acceso basado en roles (RBAC) y gestión multimedia.
 </p>
@@ -298,7 +298,10 @@ El sistema implementa 3 roles principales gestionados en `src/config/catalogos.j
 
 ---
 
-## 📄 Licencia
 
-Este proyecto está distribuido bajo la licencia **ISC**. Consulta el archivo `package.json` para más detalles.
+## 👥 Desarrolladoras
+
+- **Fátima Talamantes** — [@Fatima-Talamantes](https://github.com/Fatima-Talamantes)
+- **Deni Arellano** — [@Deni-Arellano](https://github.com/Deni-Arellano)
+
 
